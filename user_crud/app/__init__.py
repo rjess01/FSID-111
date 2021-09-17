@@ -1,8 +1,8 @@
 from app.routes import db
 
 
-class User(db.Integer, primary_key=True)
-    id = db.Column(db.Integer, primary_key=true)
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String, nullable=False)
     last_name = db.Column(db.String, nullable=False)
     hobbies = db.Column(db.String, nullable=True)
