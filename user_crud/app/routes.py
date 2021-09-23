@@ -1,15 +1,12 @@
 from datetime import datetime
-from flask import Flask, request
+from flask import Flask, request, render_template
 from flask_sqlalchemy import SQLAlchemy 
-
-
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///mydb.db"
 db = SQLAlchemy(app)
 
 from app.database import User
-
 
 @app.route("/")
 def home():
@@ -18,17 +15,16 @@ def home():
         "message": "Success",
         "server_time": datetime.now().strftime("%F %H:%M:%S")
     }
-    return out
+    return render_template("home.html", data=out)
 
 
 @app.route("/users")
 def get_all_users():
     out = {
         "status": "ok",
-        "message": "Success",
+        "message": "Success"
     }
-
-    out ["body"] = scan()
+# out ["body"] = User.query.all()
     users = User.query.all()
     out["body"] = []
     for user in users:
@@ -41,33 +37,14 @@ def get_all_users():
         out["body"].append(user_dict)
 
 
-    return out
-
-
-#user = User.query.filter_by(id=pk).first()
- #   out ["body"] = {
-  #      "user": {
-   #         "first_name": user.first_name,
-    #        "last_name": user.last_name,
-     #       "hobbies": user.hobbies,
-      #      "active": user.active
-       # }
-    #}
-    # out["body"] = {"user": user.__dict__}
-    #return out
-
-
-
+    return render_template("user_list.html", data=out)
 
 @app.route("/users/<int:pk>")
 def get_single_user(pk):
-    out = {
-        "status": "ok",
-        "message": "Success"
-    }
-    out["body"] = read(pk)
-    return out
-
+    user = User.query.filter_by(id=pk).first()
+    if user:
+        return render_template("user_detail.html", user=user)
+    return render_template("404.html"), 404
 
 @app.route("/users", methods=["POST"])
 def create_user():
@@ -76,33 +53,17 @@ def create_user():
         "message": "Success"
     }
     user_data = request.json
-    out["user_id"] = insert(
-        user_data.get("first_name"),
-        user_data.get("last_name"),
-        user_data.get("hobbies")
-    )
-    db.session.add(
-        User(
-            first_name= user_data first_name,
-            last_name=last_name,
-            hobbies=hobbies
-        )
-    )
+#     out["user_id"] = insert(
+#         user_data.get("first_name"),
+#         user_data.get("last_name"),
+#         user_data.get("hobbies")
+#     )
     return out, 201
 
-@app.route("/users", methods=["POST"])
-def create_user():
-    out = {
-        "status": "ok",
-        "message": "Success"
-    }
-    user_data = request.json
-    db.session.add(
-    User(
-        first_name = user_data.get("first_name"),
-        last_name = user_data.get("last_name"),
-        hobbies = user_data.get("hobbies")
-    )
-    db.session.commit()
-    
-    return out, 201
+# @app.route("/greeting/<user_name>")
+# def greet_user(user_name):
+#     return render_template("home.html", name=user_name)
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("404.html"), 404

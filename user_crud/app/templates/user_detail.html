@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ user.last_name }}, {{user_first.name }}
+{% endblock title %}
+
+{% block content %}
+    <h1>{{ user.last_name }}, {{ user.first_name }}</h1>
+    <span><small>User ID:{{ user.id }}</small></span>
+    <p>Status: {{ user.active }}</p>
+    <p>Hobbies: {{ user.hobbies }}</p>
+    <a class="btn btn-sucess" href="#">Update</a>
+    <a class="btn btn-danger" href="#">Delete</a>
+{% endblock content %}
+
+
